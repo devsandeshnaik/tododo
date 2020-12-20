@@ -1,16 +1,22 @@
 import 'package:flutter/Material.dart';
 import 'package:tododo/Views/PriorityTodo.dart';
+import '../Model/TodoListManager.dart';
 import '../Model/Todo.dart';
 import 'AllTodos.dart';
 
 class Homepage extends StatefulWidget {
-  final List<Todo> todoTasks = [];
-  //ignore: must_be_immutable
+  List<Todo> todoTasks = [];
   int _selectedIndex = 0;
   _Homepage createState() => _Homepage();
 }
 
 class _Homepage extends State<Homepage> {
+  @override
+  void initState() {
+    _getTodos();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,7 +59,7 @@ class _Homepage extends State<Homepage> {
         if (myController.text.length > 0) {
           var task = Todo(myController.text);
           setState(() {
-            widget.todoTasks.add(task);
+            TodoListManager.addItem(widget.todoTasks, task);
           });
           Navigator.of(context).pop();
         }
@@ -96,5 +102,15 @@ class _Homepage extends State<Homepage> {
         return SizedBox.shrink();
         break;
     }
+  }
+
+  void _getTodos() async {
+    setState(() async {
+      await TodoListManager.getTasks().then((todos) {
+        setState(() {
+          this.widget.todoTasks = todos;
+        });
+      });
+    });
   }
 }
